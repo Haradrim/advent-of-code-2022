@@ -3,7 +3,8 @@ use std::{fs, str::FromStr};
 fn main() -> anyhow::Result<()> {
     let input = read_file("input.txt")?;
 
-    println!("{:?}", part_01(&input));
+    println!("Answer 1: {:?}", part_01(&input));
+    println!("Answer 2: {:?}", part_02(input));
 
     Ok(())
 }
@@ -26,6 +27,22 @@ fn part_01(input: &Vec<String>) -> usize {
             let result = get_game_result(&hands[1], &hands[0]);
 
             result.value() + hands[1].value()
+        })
+        .sum()
+}
+
+fn part_02(input: Vec<String>) -> usize {
+    input
+        .iter()
+        .map(|game| {
+            let (hand, result) = game.split_once(' ').unwrap();
+
+            let hand = hand.parse::<Hand>().unwrap();
+            let result = result.parse::<GameResult>().unwrap();
+
+            let yours = get_game_result_2(&result, &hand);
+
+            result.value() + yours.value()
         })
         .sum()
 }
@@ -80,6 +97,19 @@ impl GameResult {
     }
 }
 
+impl FromStr for GameResult {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(match s {
+            "X" => GameResult::Lose,
+            "Y" => GameResult::Draw,
+            "Z" => GameResult::Win,
+            _ => panic!("Unknown hand"),
+        })
+    }
+}
+
 fn get_game_result(yours: &Hand, opponent: &Hand) -> GameResult {
     match yours {
         Hand::Rock => match opponent {
@@ -100,6 +130,26 @@ fn get_game_result(yours: &Hand, opponent: &Hand) -> GameResult {
     }
 }
 
+fn get_game_result_2(result: &GameResult, opponent: &Hand) -> Hand {
+    match result {
+        GameResult::Win => match opponent {
+            Hand::Rock => Hand::Paper,
+            Hand::Paper => Hand::Scissor,
+            Hand::Scissor => Hand::Rock,
+        },
+        GameResult::Draw => match opponent {
+            Hand::Rock => Hand::Rock,
+            Hand::Paper => Hand::Paper,
+            Hand::Scissor => Hand::Scissor,
+        },
+        GameResult::Lose => match opponent {
+            Hand::Rock => Hand::Scissor,
+            Hand::Paper => Hand::Rock,
+            Hand::Scissor => Hand::Paper,
+        },
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -111,10 +161,10 @@ mod tests {
         assert_eq!(part_01(&input), 15);
     }
 
-    // #[test]
-    // fn example_02() {
-    //     let instructions = read_file("example.txt").unwrap();
+    #[test]
+    fn example_02() {
+        let input = read_file("example.txt").unwrap();
 
-    //     assert_eq!(part_02(&instructions), 8);
-    // }
+        assert_eq!(part_02(input), 12);
+    }
 }
