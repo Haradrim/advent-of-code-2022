@@ -1,4 +1,4 @@
-use std::{collections::BTreeMap, fs, path::PathBuf, rc::Rc, str::FromStr};
+use std::{collections::BTreeMap, fs, path::PathBuf, str::FromStr};
 
 fn main() -> anyhow::Result<()> {
     let input = read_file("input.txt")?;

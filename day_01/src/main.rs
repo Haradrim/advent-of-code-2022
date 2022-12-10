@@ -1,8 +1,5 @@
 use anyhow::Result;
-use std::{
-    error::Error,
-    fs::{self},
-};
+use std::fs::{self};
 
 fn main() -> Result<()> {
     let input = read_file("input.txt")?;
